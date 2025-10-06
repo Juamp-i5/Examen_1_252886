@@ -1,0 +1,48 @@
+@startuml
+actor Usuario
+
+participant "panelInscritos: PanelCursosInscritos" as PanelInscritos
+participant "controlador: IControladorInscripcion" as Controlador
+participant "negocio: IInscripcionNegocio" as Negocio
+participant "modelo: IInscripcion" as Modelo
+participant "dialogo: DialogoFichaPago" as Dialogo
+
+Usuario -> PanelInscritos: click en "Finalizar Inscripción"
+activate PanelInscritos
+
+PanelInscritos -> Controlador: finalizarInscripcion()
+activate Controlador
+
+Controlador -> Negocio: finalizarInscripcion()
+activate Negocio
+
+Negocio -> Negocio: Lógica de finalización (si la hubiera)
+
+deactivate Negocio
+
+Controlador -> Negocio: getEstado()
+activate Negocio
+
+Negocio -> Modelo: getEstado()
+activate Modelo
+
+Modelo -> Modelo: new InscripcionDTO(...)
+Modelo --> Negocio: inscripcionDTO
+deactivate Modelo
+
+Negocio --> Controlador: inscripcionDTO
+deactivate Negocio
+
+Controlador -> Dialogo: new DialogoFichaPago(vista, true, dto)
+activate Dialogo
+
+Dialogo -> Dialogo: Carga los cursos y el total del DTO
+
+Controlador -> Dialogo: setVisible(true)
+
+Dialogo -> Usuario: Muestra ficha de pago
+deactivate Dialogo
+deactivate Controlador
+deactivate PanelInscritos
+
+@enduml
